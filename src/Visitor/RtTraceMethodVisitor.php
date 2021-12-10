@@ -55,21 +55,25 @@ class RtTraceMethodVisitor extends NodeVisitorAbstract
         $class->stmts[] = $clone;
 
 
-        $returnsVoid = $classMethod->getReturnType() === null || $classMethod->getReturnType()->name === 'void';
+        try {
+            $returnsVoid = $classMethod->getReturnType() instanceof Node\Identifier && $classMethod->getReturnType()->name === 'void';
+        } catch (\Throwable $e) {
+            $a = 0;
+        }
 
         $params = [];
 
-        foreach (array_values($classMethod->params) as $i => $origParam) {
+        foreach (array_values($clone->params) as $i => $origParam) {
 
             if (!$origParam instanceof Node\Param) {
                 throw new \LogicException('param has unexpected type');
             }
 
             $params[] = new Node\Arg(
-                new Node\Expr\StaticCall(new Node\Name(RtInternalTracer::class), 'traceMethodParam', [
+                new Node\Expr\StaticCall(new Node\Name('\\'.RtInternalTracer::class), 'traceMethodParam', [
                     $origParam->var,
                     new String_($class->name?->name ?? '#unknown'),
-                    new String_($classMethod->name->name),
+                    new String_($clone->name->name),
                     new String_($origParam->var->name),
                     new LNumber($i),
                     new LNumber($origParam->var->getStartLine()),
@@ -90,7 +94,16 @@ class RtTraceMethodVisitor extends NodeVisitorAbstract
         $classMethod->stmts = [
             ($returnsVoid
                 ? new Node\Stmt\Expression($methodCall)
-                : new Node\Stmt\Return_($methodCall)
+                : new Node\Stmt\Return_(
+                    new Node\Expr\StaticCall(new Node\Name('\\'.RtInternalTracer::class), 'traceMethodReturn', [
+                        $methodCall,
+                        new String_($class->name?->name ?? '#unknown'),
+                        new String_($clone->name->name),
+                        new LNumber($clone->getStartLine()),
+                        new LNumber($clone->getEndLine()),
+                        new String_($this->file),
+                    ])
+                )
             ),
         ];
     }

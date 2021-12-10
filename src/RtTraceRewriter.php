@@ -22,6 +22,9 @@ use timglabisch\PhpRtTrace\Visitor\RtTraceMethodVisitor;
 
 class RtTraceRewriter
 {
+    private const DEBUG = false;
+    private const VERSION = '1';
+
     public function __construct(
         private array $files
     )
@@ -35,10 +38,10 @@ class RtTraceRewriter
     }
 
     public function rewriteFile(string $file) {
+        $fileContent = file_get_contents($file);
         $parser = (new ParserFactory)->create(ParserFactory::PREFER_PHP7);
         try {
-            $ast = $parser->parse(file_get_contents($file));
-            $astOrig = $parser->parse(file_get_contents($file));
+            $ast = $parser->parse($fileContent);
         } catch (Error $error) {
             echo "Parse error: {$error->getMessage()}\n";
             return;
@@ -50,13 +53,18 @@ class RtTraceRewriter
 
         $ast = $traverser->traverse($ast);
 
-        $dumper = new NodeDumper;
-        $astDump = $dumper->dump($ast) . "\n";
-
         $prettyPrinter = new PrettyPrinter\Standard();
         $pretty = $prettyPrinter->prettyPrintFile($ast);
 
-        file_put_contents($file.'.pretty.php', $pretty);
+        if (self::DEBUG) {
+            file_put_contents($file . '.pretty.php', $pretty);
+        }
+
+        $tmpFile = './' . hash('sha512', self::VERSION . $fileContent).'.php';
+
+        file_put_contents($tmpFile, $pretty);
+
+        require $tmpFile;
     }
 
 }
