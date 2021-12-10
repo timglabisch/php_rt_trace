@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace timglabisch\PhpRtRrace;
+namespace timglabisch\PhpRtTrace;
 
 class RtTraceRewriter
 {

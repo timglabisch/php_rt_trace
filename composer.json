@@ -13,12 +13,12 @@
   },
   "autoload": {
     "psr-4": {
-      "timglabisch\\PhpRtRrace\\": "src/"
+      "timglabisch\\PhpRtTrace\\": "src/"
     }
   },
   "autoload-dev": {
     "psr-4": {
-      "timglabisch\\PhpRtRrace\\Tests\\": "tests/"
+      "timglabisch\\PhpRtTrace\\Tests\\": "tests/"
     }
   }
 }
