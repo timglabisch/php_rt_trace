@@ -48,7 +48,7 @@ class RtTraceMethodVisitor extends NodeVisitorAbstract
 
         $clone->name = new Node\Identifier($newFunctioName);
         $clone->setDocComment(new Doc(''));
-        $clone->setAttributes([]);
+        $clone->attrGroups = [];
 
         // $clone-> todo, make private
 

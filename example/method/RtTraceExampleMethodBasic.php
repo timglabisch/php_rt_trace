@@ -8,6 +8,7 @@ class RtTraceExampleMethodBasic
         $this->fooBar($a, $b);
     }
 
+    #[Foo]
     function fooMixed($a, $b): mixed {
         return $this->fooBar($a, $b);
     }
