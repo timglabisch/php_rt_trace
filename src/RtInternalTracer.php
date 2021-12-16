@@ -20,4 +20,9 @@ class RtInternalTracer
         $a = 0;
         return $value;
     }
+
+    public static function tracePropertyAssign(mixed $value, string $className, string $propertyName, int $startLine, int $endLine, string $file): mixed {
+        $a = 0;
+        return $value;
+    }
 }

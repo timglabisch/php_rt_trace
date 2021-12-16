@@ -9,17 +9,38 @@ use timglabisch\PhpRtTrace\RtTraceRewriter;
 
 class PhpRtTracePrettyFilesTest extends TestCase
 {
-    public function dataProviderPrettyFiles(): \Generator {
-        foreach (glob(__DIR__ .'/../example/**/*.pretty.php') as $file) {
-            yield [$file, str_replace('.pretty.php', '', $file)];
+    private const REWRITE_FILES = true;
+
+    public function dataProviderPrettyFilesDummy() {
+
+        return [[
+            __DIR__ .'/../example/property/RtTraceExampleBasicProperty.php.pretty.php',
+            __DIR__ .'/../example/property/RtTraceExampleBasicProperty.php',
+        ]];
+    }
+
+    public function dataProviderPrettyFiles() {
+
+        die();
+        foreach (glob(__DIR__ .'/../example/**/*.php') as $file) {
+            if (str_contains($file, '.pretty.')) {
+                continue;
+            }
+
+            yield [$file . '.pretty.php', $file];
         }
     }
 
-    /** @dataProvider dataProviderPrettyFiles */
+    /** @dataProvider dataProviderPrettyFilesDummy */
     public function testPrettyFiles(string $expectedPrettyFile, string $file): void {
 
         $pretty = (new RtTraceRewriter())->rewriteFile($file);
 
-        static::assertSame($expectedPrettyFile, $pretty);
+        if (self::REWRITE_FILES) {
+            file_put_contents($expectedPrettyFile, $pretty);
+        }
+
+        $expectedPrettyFileContent = file_get_contents($expectedPrettyFile);
+        static::assertSame($expectedPrettyFileContent, $pretty);
     }
 }
