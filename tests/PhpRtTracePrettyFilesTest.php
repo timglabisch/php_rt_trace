@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace Tests\timglabisch\PhpRtTrace;
 
 use PHPUnit\Framework\TestCase;
+use timglabisch\PhpRtTrace\RtInternalTracer;
 use timglabisch\PhpRtTrace\RtTraceRewriter;
+use timglabisch\PhpRtTrace\TraceWriter\RtTraceWriterBuffer;
 
 class PhpRtTracePrettyFilesTest extends TestCase
 {
-    private const REWRITE_FILES = false;
+    private const REWRITE_FILES = true;
 
     public function dataProviderPrettyFilesDummy() {
 
@@ -26,20 +28,23 @@ class PhpRtTracePrettyFilesTest extends TestCase
                 continue;
             }
 
-            yield [$file . '.pretty.php', $file];
+            yield [$file . '.pretty.php', $file . '.trace.php', $file];
         }
     }
 
     /** @dataProvider dataProviderPrettyFiles */
-    public function testPrettyFiles(string $expectedPrettyFile, string $file): void {
+    public function testPrettyFiles(string $expectedPrettyFile, string $expectedTraceFile, string $file): void {
 
+        // RtInternalTracer::$traceWriter = $traceWriter = new RtTraceWriterBuffer();
         $pretty = (new RtTraceRewriter())->rewriteFile($file);
+        // $traces = implode("\n", $traceWriter->getBuffer());
 
         if (self::REWRITE_FILES) {
             file_put_contents($expectedPrettyFile, $pretty);
+            // file_put_contents($expectedTraceFile, $traces);
         }
 
-        $expectedPrettyFileContent = file_get_contents($expectedPrettyFile);
-        static::assertSame($expectedPrettyFileContent, $pretty);
+        static::assertSame(file_get_contents($expectedPrettyFile), $pretty);
+        // static::assertSame(file_get_contents($expectedTraceFile), $traces);
     }
 }
