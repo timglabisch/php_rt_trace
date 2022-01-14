@@ -34,6 +34,12 @@ class RtTraceMethodVisitor extends NodeVisitorAbstract
 
     private function leaveClassMethod(Node\Stmt\Class_ $class, Node\Stmt\ClassMethod $classMethod)
     {
+        if ($classMethod->name->name === "__construct") {
+            // constructor is not yet supported, a bit more complex because we cant simply copy the methode.
+            // it may looks like __construct(private ...) which is just supported in constructors.
+            return;
+        }
+
         if ($classMethod->isPrivate()) {
             return;
         }
@@ -55,11 +61,7 @@ class RtTraceMethodVisitor extends NodeVisitorAbstract
         $class->stmts[] = $clone;
 
 
-        try {
-            $returnsVoid = $classMethod->getReturnType() instanceof Node\Identifier && $classMethod->getReturnType()->name === 'void';
-        } catch (\Throwable $e) {
-            $a = 0;
-        }
+        $returnsVoid = $classMethod->getReturnType() instanceof Node\Identifier && $classMethod->getReturnType()->name === 'void';
 
         $params = [];
 
@@ -69,9 +71,11 @@ class RtTraceMethodVisitor extends NodeVisitorAbstract
                 throw new \LogicException('param has unexpected type');
             }
 
+            $origParamClone = clone $origParam;
+            $origParamClone->flags = 0;
             $params[] = new Node\Arg(
                 new Node\Expr\StaticCall(new Node\Name('\\'.RtInternalTracer::class), 'traceMethodParam', [
-                    $origParam->var,
+                    $origParamClone->var,
                     new String_($class->name?->name ?? '#unknown'),
                     new String_($clone->name->name),
                     new String_($origParam->var->name),

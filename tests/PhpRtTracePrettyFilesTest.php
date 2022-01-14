@@ -14,8 +14,8 @@ class PhpRtTracePrettyFilesTest extends TestCase
     public function dataProviderPrettyFilesDummy() {
 
         return [[
-            __DIR__ .'/../example/property/RtTraceExamplePropertyAccessRead.php.pretty.php',
-            __DIR__ .'/../example/property/RtTraceExamplePropertyAccessRead.php',
+            __DIR__ .'/../example/method/TrTraceExampleMethodConstructor.php.pretty.php',
+            __DIR__ .'/../example/method/TrTraceExampleMethodConstructor.php',
         ]];
     }
 
@@ -30,8 +30,8 @@ class PhpRtTracePrettyFilesTest extends TestCase
         }
     }
 
-    /** @dataProvider dataProviderPrettyFiles */
-    public function testPrettyFiles(string $expectedPrettyFile, string $expectedTraceFile, string $file): void {
+    /** @dataProvider dataProviderPrettyFilesDummy */
+    public function testPrettyFiles(string $expectedPrettyFile, string $file): void {
 
         // RtInternalTracer::$traceWriter = $traceWriter = new RtTraceWriterBuffer();
         $pretty = (new RtTraceRewriter())->rewriteFile($file);
