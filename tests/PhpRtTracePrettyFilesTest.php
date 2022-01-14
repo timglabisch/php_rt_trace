@@ -5,13 +5,11 @@ declare(strict_types=1);
 namespace Tests\timglabisch\PhpRtTrace;
 
 use PHPUnit\Framework\TestCase;
-use timglabisch\PhpRtTrace\RtInternalTracer;
 use timglabisch\PhpRtTrace\RtTraceRewriter;
-use timglabisch\PhpRtTrace\TraceWriter\RtTraceWriterBuffer;
 
 class PhpRtTracePrettyFilesTest extends TestCase
 {
-    private const REWRITE_FILES = true;
+    private const REWRITE_FILES = false;
 
     public function dataProviderPrettyFilesDummy() {
 
