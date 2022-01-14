@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-class RtTraceExampleBasicProperty
+class RtTraceExamplePropertyAccessRead
 {
     private $foo;
 

@@ -9,19 +9,18 @@ use timglabisch\PhpRtTrace\RtTraceRewriter;
 
 class PhpRtTracePrettyFilesTest extends TestCase
 {
-    private const REWRITE_FILES = true;
+    private const REWRITE_FILES = false;
 
     public function dataProviderPrettyFilesDummy() {
 
         return [[
-            __DIR__ .'/../example/property/RtTraceExampleBasicProperty.php.pretty.php',
-            __DIR__ .'/../example/property/RtTraceExampleBasicProperty.php',
+            __DIR__ .'/../example/property/RtTraceExamplePropertyAccessRead.php.pretty.php',
+            __DIR__ .'/../example/property/RtTraceExamplePropertyAccessRead.php',
         ]];
     }
 
     public function dataProviderPrettyFiles() {
 
-        die();
         foreach (glob(__DIR__ .'/../example/**/*.php') as $file) {
             if (str_contains($file, '.pretty.')) {
                 continue;
@@ -31,7 +30,7 @@ class PhpRtTracePrettyFilesTest extends TestCase
         }
     }
 
-    /** @dataProvider dataProviderPrettyFilesDummy */
+    /** @dataProvider dataProviderPrettyFiles */
     public function testPrettyFiles(string $expectedPrettyFile, string $file): void {
 
         $pretty = (new RtTraceRewriter())->rewriteFile($file);

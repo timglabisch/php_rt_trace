@@ -10,7 +10,8 @@ use PhpParser\ParserFactory;
 use PhpParser\PrettyPrinter;
 use timglabisch\PhpRtTrace\Visitor\RtTraceAssignVisitor;
 use timglabisch\PhpRtTrace\Visitor\RtTraceMethodVisitor;
-use timglabisch\PhpRtTrace\Visitor\RtTracePropertyAccessVisitor;
+use timglabisch\PhpRtTrace\Visitor\RtTracePropertyAccessAssignVisitor;
+use timglabisch\PhpRtTrace\Visitor\RtTracePropertyAccessReadVisitor;
 
 
 class RtTraceRewriter
@@ -43,9 +44,10 @@ class RtTraceRewriter
         }
 
         $traverser = new NodeTraverser();
-        // $traverser->addVisitor(new RtTraceAssignVisitor($filename));
-        $traverser->addVisitor(new RtTracePropertyAccessVisitor($filename));
-        //$traverser->addVisitor(new RtTraceMethodVisitor($filename));
+        $traverser->addVisitor(new RtTraceAssignVisitor($filename));
+        $traverser->addVisitor(new RtTracePropertyAccessAssignVisitor($filename));
+        $traverser->addVisitor(new RtTraceMethodVisitor($filename));
+        $traverser->addVisitor(new RtTracePropertyAccessReadVisitor($filename));
 
         $ast = $traverser->traverse($ast);
 

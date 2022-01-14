@@ -12,7 +12,7 @@ use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\NodeVisitorAbstract;
 use timglabisch\PhpRtTrace\RtInternalTracer;
 
-class RtTracePropertyAccessVisitor extends NodeVisitorAbstract
+class RtTracePropertyAccessAssignVisitor extends NodeVisitorAbstract
 {
     private \SplStack $classStack;
 
