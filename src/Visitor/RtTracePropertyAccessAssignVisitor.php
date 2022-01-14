@@ -58,6 +58,10 @@ class RtTracePropertyAccessAssignVisitor extends NodeVisitorAbstract
             return;
         }
 
+        if ($this->classStack->isEmpty()) {
+            return;
+        }
+
         $class = $this->classStack->top();
         if (!$class instanceof Node\Stmt\Class_) {
             return;

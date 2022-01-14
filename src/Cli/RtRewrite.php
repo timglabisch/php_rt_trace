@@ -64,6 +64,16 @@ class RtRewrite
             file_put_contents($file->getPathname(), $rewrittenContent);
 
             echo "rewritten " . $file->getPathname() . "\n";
+
+            $out = '';
+            $code = '';
+            exec('php -l ' . escapeshellarg($file->getPathname()), $out, $code);
+
+            if ((int)$code !== 0) {
+                echo 'linting failed' . "\n";
+                die();
+            }
+
         }
 
         echo 'done'. "\n";

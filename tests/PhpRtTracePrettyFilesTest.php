@@ -9,13 +9,13 @@ use timglabisch\PhpRtTrace\RtTraceRewriter;
 
 class PhpRtTracePrettyFilesTest extends TestCase
 {
-    private const REWRITE_FILES = false;
+    private const REWRITE_FILES = true;
 
     public function dataProviderPrettyFilesDummy() {
 
         return [[
-            __DIR__ .'/../example/method/TrTraceExampleMethodConstructor.php.pretty.php',
-            __DIR__ .'/../example/method/TrTraceExampleMethodConstructor.php',
+            __DIR__ .'/../example/method/TrTraceByRef.php.pretty.php',
+            __DIR__ .'/../example/method/TrTraceByRef.php',
         ]];
     }
 

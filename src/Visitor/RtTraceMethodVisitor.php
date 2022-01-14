@@ -24,6 +24,11 @@ class RtTraceMethodVisitor extends NodeVisitorAbstract
     {
 
         if ($node instanceof Node\Stmt\Class_) {
+
+            if ($node->isAbstract()) {
+                return;
+            }
+
             foreach ($node->stmts as $stmt) {
                 if ($stmt instanceof ClassMethod) {
                     $this->leaveClassMethod($node, $stmt);
