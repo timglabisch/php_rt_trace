@@ -10,25 +10,27 @@ use PhpParser\NodeVisitorAbstract;
 
 class RtTraceVisitorIsChildOfVisitor extends NodeVisitorAbstract
 {
-    private bool $found = false;
+    private ?Node $found = null;
 
     public function __construct(
-        private NodeAbstract $nodeToFind
+        private mixed $findCallable
     ) {
     }
 
     public function enterNode(Node $node)
     {
+        $callable = $this->findCallable;
+
         if ($this->found) {
             return;
         }
 
-        if ($this->nodeToFind === $node) {
-            $this->found = true;
+        if ($callable($node)) {
+            $this->found = $node;
         }
     }
 
-    public function hasFound(): bool {
+    public function getFoundNode(): ?Node {
         return $this->found;
     }
 

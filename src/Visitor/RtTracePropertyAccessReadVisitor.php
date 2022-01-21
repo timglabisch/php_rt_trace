@@ -49,16 +49,26 @@ class RtTracePropertyAccessReadVisitor extends NodeVisitorAbstract
     public function nodeIsOnLeftSideOfAssignments(Node $node, array $assigns): bool {
         foreach ($assigns as $assign) {
             $traverser = (new NodeTraverser());
-            $childOfVisitor = (new RtTraceVisitorIsChildOfVisitor($assign->var));
+            $childOfVisitor = (new RtTraceVisitorIsChildOfVisitor(fn(Node $v) => $v === $assign->var));
             $traverser->addVisitor($childOfVisitor);
             $traverser->traverse([$node]);
 
-            if ($childOfVisitor->hasFound()) {
+            if ($childOfVisitor->getFoundNode()) {
                 return true;
             }
         }
 
         return false;
+    }
+
+    public function findNodeByNodeStack(callable $callable): ?Node {
+        foreach ($this->nodeStack as $item) {
+            if ($callable($item)) {
+                return $item;
+            }
+        }
+
+        return null;
     }
 
     public function leaveNode(Node $node)
@@ -69,7 +79,11 @@ class RtTracePropertyAccessReadVisitor extends NodeVisitorAbstract
             return;
         }
 
-        if (!$node instanceof  Node\Expr\PropertyFetch) {
+        if ($node instanceof Node\Expr\FuncCall) {
+            return $this->leaveNodeFuncCall($node);
+        }
+
+        if (!$node instanceof Node\Expr\PropertyFetch) {
             return;
         }
 
@@ -108,6 +122,12 @@ class RtTracePropertyAccessReadVisitor extends NodeVisitorAbstract
             return; // @see RtTracePropertyAccessAssignVisitor
         }
 
+        if ($this->findNodeByNodeStack(fn (Node $v) => $v instanceof Node\Arg)) {
+            // when our current node is part of a param (function call) it becomes a bit trickier
+            // because the function call might want to have &$this->XXX instead of $this->XXX
+            return;
+        }
+
         return new Node\Expr\StaticCall(
             class: new FullyQualified(RtInternalTracer::class),
             name: new Node\Identifier('tracePropertyFetch'),
@@ -121,6 +141,51 @@ class RtTracePropertyAccessReadVisitor extends NodeVisitorAbstract
             ]
         );
 
+    }
+
+    public function leaveNodeFuncCall(Node\Expr\FuncCall $call) {
+
+        $propertyFetches = [];
+        foreach ($call->args as $arg) {
+            if (!($arg instanceof Node\Arg)) {
+                continue;
+            }
+
+            if ($arg->value instanceof Node\Expr\PropertyFetch) {
+                $propertyFetches[] = $arg->value;
+            }
+        }
+
+        if (!$propertyFetches) {
+            return;
+        }
+
+        return new Node\Expr\ArrayDimFetch(
+            new Node\Expr\FuncCall(
+                new Node\Expr\ArrowFunction([
+                    'expr' => new Node\Expr\Array_(
+                        array_merge(
+                            [$call],
+                            array_map(function(Node\Expr\PropertyFetch $propertyFetch) {
+                                return new Node\Expr\StaticCall(
+                                    class: new FullyQualified(RtInternalTracer::class),
+                                    name: new Node\Identifier('tracePropertyFetch'),
+                                    args: [
+                                        $propertyFetch,
+                                        new String_($class->name?->name ?? 'unknown'),
+                                        new String_($propertyFetch->name->name),
+                                        new LNumber($propertyFetch->getStartLine()),
+                                        new LNumber($propertyFetch->getEndLine()),
+                                        new String_($this->file),
+                                    ]
+                                );
+                            }, $propertyFetches)
+                        )
+                    )
+                ])
+            ),
+            new LNumber(0)
+        );
     }
 
 }
