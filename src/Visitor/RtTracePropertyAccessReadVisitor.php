@@ -49,9 +49,9 @@ class RtTracePropertyAccessReadVisitor extends NodeVisitorAbstract
     public function nodeIsOnLeftSideOfAssignments(Node $node, array $assigns): bool {
         foreach ($assigns as $assign) {
             $traverser = (new NodeTraverser());
-            $childOfVisitor = (new RtTraceVisitorIsChildOfVisitor(fn(Node $v) => $v === $assign->var));
+            $childOfVisitor = (new RtTraceVisitorIsChildOfVisitor(fn(Node $v) => $v === $node));
             $traverser->addVisitor($childOfVisitor);
-            $traverser->traverse([$node]);
+            $traverser->traverse([$assign->var]);
 
             if ($childOfVisitor->getFoundNode()) {
                 return true;
@@ -158,6 +158,11 @@ class RtTracePropertyAccessReadVisitor extends NodeVisitorAbstract
 
         if (!$propertyFetches) {
             return;
+        }
+
+        // needed?
+        if ($this->nodeIsOnLeftSideOfAssignments($call, $this->getAssignFromNodeStack())) {
+            return; // @see RtTracePropertyAccessAssignVisitor
         }
 
         return new Node\Expr\ArrayDimFetch(

@@ -11,10 +11,10 @@ class RtInternalTracer
     public static ?RtTraceWriterInterface $traceWriter = null;
 
     private static function encodeAndSaveBlock(array $arr): void {
-        self::$traceWriter?->write($arr);
+        //self::$traceWriter?->write($arr);
     }
 
-    public static function traceVariableAssign(mixed $value, string $name, int $startLine, string $endLine, string $file): mixed {
+    public static function traceVariableAssign(mixed $value, string $name, int $startLine, int $endLine, string $file): mixed {
         static::encodeAndSaveBlock([
             'opcode' => 'VariableAssign',
             'type' => get_debug_type($value),
