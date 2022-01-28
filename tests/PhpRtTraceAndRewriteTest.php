@@ -24,7 +24,9 @@ class PhpRtTraceAndRewriteTest extends TestCase
         eval($rewrite);
 
         $logReader = RtLogReader::newFromString($writer->getBuffer());
-        $logReader->addCollector(new RtPropertyCollector(PhpRtFixtureBasicClass::class));
+        $logReader->addCollector(new RtPropertyCollector([
+            PhpRtFixtureBasicClass::class
+        ]));
         $logReader->run();
     }
 
