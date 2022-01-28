@@ -7,7 +7,7 @@ class RtTraceExampleMethodBasic
     {
         $this->__rt_trace__foo(\timglabisch\PhpRtTrace\RtInternalTracer::traceMethodParam($a, 'RtTraceExampleMethodBasic', '__rt_trace__foo', 'a', 0, 7, 7, '/usr/share/nginx/devel_sf/vendor/timglabisch/php_rt_trace/tests/../example/method/RtTraceExampleMethodBasic.php'), \timglabisch\PhpRtTrace\RtInternalTracer::traceMethodParam($b, 'RtTraceExampleMethodBasic', '__rt_trace__foo', 'b', 1, 7, 7, '/usr/share/nginx/devel_sf/vendor/timglabisch/php_rt_trace/tests/../example/method/RtTraceExampleMethodBasic.php'));
     }
-    #[Foo]
+    #[\Foo]
     function fooMixed($a, $b) : mixed
     {
         return \timglabisch\PhpRtTrace\RtInternalTracer::traceMethodReturn($this->__rt_trace__fooMixed(\timglabisch\PhpRtTrace\RtInternalTracer::traceMethodParam($a, 'RtTraceExampleMethodBasic', '__rt_trace__fooMixed', 'a', 0, 12, 12, '/usr/share/nginx/devel_sf/vendor/timglabisch/php_rt_trace/tests/../example/method/RtTraceExampleMethodBasic.php'), \timglabisch\PhpRtTrace\RtInternalTracer::traceMethodParam($b, 'RtTraceExampleMethodBasic', '__rt_trace__fooMixed', 'b', 1, 12, 12, '/usr/share/nginx/devel_sf/vendor/timglabisch/php_rt_trace/tests/../example/method/RtTraceExampleMethodBasic.php')), 'RtTraceExampleMethodBasic', '__rt_trace__fooMixed', 11, 14, '/usr/share/nginx/devel_sf/vendor/timglabisch/php_rt_trace/tests/../example/method/RtTraceExampleMethodBasic.php');

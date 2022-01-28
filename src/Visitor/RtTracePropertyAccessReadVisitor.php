@@ -133,7 +133,7 @@ class RtTracePropertyAccessReadVisitor extends NodeVisitorAbstract
             name: new Node\Identifier('tracePropertyFetch'),
             args: [
                 $node,
-                new String_($class->name?->name ?? 'unknown'),
+                new String_($class->namespacedName?->toString() ?? 'unknown'),
                 new String_($propertyFetch->name->name),
                 new LNumber($propertyFetch->getStartLine()),
                 new LNumber($propertyFetch->getEndLine()),
@@ -165,19 +165,24 @@ class RtTracePropertyAccessReadVisitor extends NodeVisitorAbstract
             return; // @see RtTracePropertyAccessAssignVisitor
         }
 
+        $class = $this->classStack->top();
+        if (!$class instanceof Node\Stmt\Class_) {
+            return;
+        }
+
         return new Node\Expr\ArrayDimFetch(
             new Node\Expr\FuncCall(
                 new Node\Expr\ArrowFunction([
                     'expr' => new Node\Expr\Array_(
                         array_merge(
                             [$call],
-                            array_map(function(Node\Expr\PropertyFetch $propertyFetch) {
+                            array_map(function(Node\Expr\PropertyFetch $propertyFetch) use ($class) {
                                 return new Node\Expr\StaticCall(
                                     class: new FullyQualified(RtInternalTracer::class),
                                     name: new Node\Identifier('tracePropertyFetch'),
                                     args: [
                                         $propertyFetch,
-                                        new String_($class->name?->name ?? 'unknown'),
+                                        new String_($class->namespacedName?->toString() ?? 'unknown'),
                                         new String_($propertyFetch->name->name),
                                         new LNumber($propertyFetch->getStartLine()),
                                         new LNumber($propertyFetch->getEndLine()),

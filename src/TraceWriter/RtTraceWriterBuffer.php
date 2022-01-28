@@ -6,14 +6,20 @@ namespace timglabisch\PhpRtTrace\TraceWriter;
 
 class RtTraceWriterBuffer implements RtTraceWriterInterface
 {
-    private array $buffer = [];
+    private string $buffer = '';
 
     public function write(array $arr): void
     {
-        $this->buffer[] = $arr;
+        try {
+            $data = json_encode($arr, JSON_THROW_ON_ERROR);
+        } catch (\Throwable $t) {
+            $data = @json_encode(['opcode' => 'error', 'msg' => $t]);
+        }
+
+        $this->buffer .= $data;
     }
 
-    public function getBuffer(): array
+    public function getBuffer(): string
     {
         return $this->buffer;
     }

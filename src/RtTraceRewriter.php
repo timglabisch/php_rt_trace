@@ -6,6 +6,7 @@ namespace timglabisch\PhpRtTrace;
 
 use PhpParser\Error;
 use PhpParser\NodeTraverser;
+use PhpParser\NodeVisitor\NameResolver;
 use PhpParser\ParserFactory;
 use PhpParser\PrettyPrinter;
 use timglabisch\PhpRtTrace\Visitor\RtTraceAssignVisitor;
@@ -44,6 +45,7 @@ class RtTraceRewriter
         }
 
         $traverser = new NodeTraverser();
+        $traverser->addVisitor(new NameResolver());
         $traverser->addVisitor(new RtTraceAssignVisitor($filename));
         $traverser->addVisitor(new RtTracePropertyAccessAssignVisitor($filename));
         $traverser->addVisitor(new RtTraceMethodVisitor($filename));

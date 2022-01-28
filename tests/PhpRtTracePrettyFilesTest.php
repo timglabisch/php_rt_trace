@@ -9,7 +9,7 @@ use timglabisch\PhpRtTrace\RtTraceRewriter;
 
 class PhpRtTracePrettyFilesTest extends TestCase
 {
-    private const REWRITE_FILES = true;
+    private const REWRITE_FILES = false;
 
     public function dataProviderPrettyFilesDummy() {
 
@@ -26,11 +26,11 @@ class PhpRtTracePrettyFilesTest extends TestCase
                 continue;
             }
 
-            yield [$file . '.pretty.php', $file . '.trace.php', $file];
+            yield [$file . '.pretty.php', $file];
         }
     }
 
-    /** @dataProvider dataProviderPrettyFilesDummy */
+    /** @dataProvider dataProviderPrettyFiles */
     public function testPrettyFiles(string $expectedPrettyFile, string $file): void {
 
         // RtInternalTracer::$traceWriter = $traceWriter = new RtTraceWriterBuffer();
