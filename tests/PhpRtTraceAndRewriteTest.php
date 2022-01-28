@@ -24,10 +24,13 @@ class PhpRtTraceAndRewriteTest extends TestCase
         eval($rewrite);
 
         $logReader = RtLogReader::newFromString($writer->getBuffer());
-        $logReader->addCollector(new RtPropertyCollector([
-            PhpRtFixtureBasicClass::class
+        $logReader->addCollector($propertyCollector = new RtPropertyCollector([
+            $file
         ]));
         $logReader->run();
+
+        $typemap = $propertyCollector->getPropertyTypeMap();
+        $a = 0;
     }
 
 }

@@ -16,7 +16,7 @@ class RtTraceWriterBuffer implements RtTraceWriterInterface
             $data = @json_encode(['opcode' => 'error', 'msg' => $t]);
         }
 
-        $this->buffer .= $data;
+        $this->buffer .= $data . "\n";
     }
 
     public function getBuffer(): string

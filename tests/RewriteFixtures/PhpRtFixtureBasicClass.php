@@ -16,3 +16,5 @@ class PhpRtFixtureBasicClass
 }
 
 new PhpRtFixtureBasicClass(123);
+new PhpRtFixtureBasicClass("123");
+new PhpRtFixtureBasicClass("123");

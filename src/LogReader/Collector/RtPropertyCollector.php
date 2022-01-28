@@ -4,27 +4,28 @@ declare(strict_types=1);
 
 namespace timglabisch\PhpRtTrace\LogReader\Collector;
 
+use timglabisch\PhpRtTrace\LogReader\Dto\RtPropertyTypeMap;
 use timglabisch\PhpRtTrace\RtInternalTracer;
 
 class RtPropertyCollector implements RtCollectorInterface
 {
-    private array $encodedClassNames;
+    private array $encodedFileNames;
     private array $buffer;
 
     public function __construct(
-        private array $classNames
+        private array $fileNames
     )
     {
-        $this->encodedClassNames = array_map(
+        $this->encodedFileNames = array_map(
             fn(string $v) => trim(json_encode($v), ""),
-            $this->classNames
+            $this->fileNames
         );
     }
 
     public function looksInteresting(string $bytes): bool
     {
-        foreach ($this->encodedClassNames as $encodedClassName) {
-            if (str_contains($bytes, $encodedClassName)) {
+        foreach ($this->encodedFileNames as $encodedFileName) {
+            if (str_contains($bytes, $encodedFileName)) {
                 return true;
             }
         }
@@ -41,7 +42,7 @@ class RtPropertyCollector implements RtCollectorInterface
             return;
         }
 
-        if (!in_array($data['class'], $this->classNames, true)) {
+        if (!in_array($data['file'], $this->fileNames, true)) {
             return;
         }
 
@@ -54,7 +55,9 @@ class RtPropertyCollector implements RtCollectorInterface
             $this->buffer[$data['class']][$data['propertyName']]['type'][$type] = $this->buffer[$data['class']][$data['propertyName']]['type'][$type] ?? 0;
             $this->buffer[$data['class']][$data['propertyName']]['type'][$type] += $count;
         }
+    }
 
-        $a = 0;
+    public function getPropertyTypeMap(): RtPropertyTypeMap {
+        return new RtPropertyTypeMap($this->buffer);
     }
 }
