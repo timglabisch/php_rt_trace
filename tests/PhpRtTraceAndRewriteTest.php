@@ -10,6 +10,7 @@ use timglabisch\PhpRtTrace\LogReader\RtLogReader;
 use timglabisch\PhpRtTrace\RtTraceRewriter;
 use timglabisch\PhpRtTrace\TraceWriter\RtTraceWriterBuffer;
 use Tests\timglabisch\PhpRtTrace\RewriteFixtures\PhpRtFixtureBasicClass;
+use timglabisch\PhpRtTrace\TypeApplyer\RtTypeApplyer;
 
 class PhpRtTraceAndRewriteTest extends TestCase
 {
@@ -30,7 +31,18 @@ class PhpRtTraceAndRewriteTest extends TestCase
         $logReader->run();
 
         $typemap = $propertyCollector->getPropertyTypeMap();
-        $a = 0;
+
+        $typeApplyer = RtTypeApplyer::newFromFile($file);
+
+        $typeApplyer->applyPropertyTypes($typemap);
+
+        $pretty = $typeApplyer->getPretty();
+
+        $applyedFile = str_replace(['.php'], ['.applyed.php'], $file);
+        // file_put_contents($applyedFile, $pretty);
+
+        static::assertEquals(file_get_contents($applyedFile), $pretty);
+
     }
 
 }

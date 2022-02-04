@@ -48,12 +48,12 @@ class RtPropertyCollector implements RtCollectorInterface
 
         $this->buffer[$data['class']] = $this->buffer[$data['class']] ?? [];
         $this->buffer[$data['class']][$data['propertyName']] = $this->buffer[$data['class']][$data['propertyName']] ?? [
-            'type' => []
+            'types' => []
         ];
 
         foreach ($data['type'] as $type => $count) {
-            $this->buffer[$data['class']][$data['propertyName']]['type'][$type] = $this->buffer[$data['class']][$data['propertyName']]['type'][$type] ?? 0;
-            $this->buffer[$data['class']][$data['propertyName']]['type'][$type] += $count;
+            $this->buffer[$data['class']][$data['propertyName']]['types'][$type] = $this->buffer[$data['class']][$data['propertyName']]['types'][$type] ?? 0;
+            $this->buffer[$data['class']][$data['propertyName']]['types'][$type] += $count;
         }
     }
 

@@ -44,6 +44,16 @@ class RtTypeApplyerPropertyVisitor extends NodeVisitorAbstract
             return;
         }
 
+        // for safety reason just private is supported now.
+        if (!$property->isPrivate()) {
+            return;
+        }
+
+        // for safety reason just normal classes.
+        if ($class->isAbstract()) {
+            return;
+        }
+
         if (!($property->props[0] ?? null) instanceof PropertyProperty) {
             return;
         }
@@ -51,6 +61,10 @@ class RtTypeApplyerPropertyVisitor extends NodeVisitorAbstract
         $propertyProperty = $property->props[0];
 
         $typeInfo = $this->propertyTypeMap->getTypesByAst($class, $property);
+
+        if ($typeInfo === []) {
+            return;
+        }
 
         $addType = function(string $type) use (&$typeInfo) {
             if (in_array($type, $typeInfo)) {
