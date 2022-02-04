@@ -5,6 +5,6 @@ namespace Tests\timglabisch\PhpRtTrace\ApplyerFixtures;
 
 class ApplyerFixtureBasicClass
 {
-    private $a;
+    private int|string $a;
     private int $b;
 }
