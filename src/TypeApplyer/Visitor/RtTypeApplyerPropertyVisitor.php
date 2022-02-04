@@ -74,6 +74,11 @@ class RtTypeApplyerPropertyVisitor extends NodeVisitorAbstract
             $typeInfo[] = $type;
         };
 
+        // todo, may we could do better?
+        if ($propertyProperty->default === null) {
+            $addType('null');
+        }
+
         if ($propertyProperty->default !== null) {
             if ($propertyProperty->default instanceof Node\Scalar\LNumber) {
                 $addType('int');
