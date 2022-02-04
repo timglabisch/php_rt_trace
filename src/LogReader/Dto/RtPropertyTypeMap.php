@@ -22,8 +22,6 @@ class RtPropertyTypeMap
             $buf[] = $type;
         }
 
-        usort($buf, fn(string $a, string $b) => strnatcmp($a, $b));
-
         return $buf;
     }
 
