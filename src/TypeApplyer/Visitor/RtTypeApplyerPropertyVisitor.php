@@ -74,9 +74,9 @@ class RtTypeApplyerPropertyVisitor extends NodeVisitorAbstract
             $typeInfo[] = $type;
         };
 
-        // todo, may we could do better?
         if ($propertyProperty->default === null) {
             $addType('null');
+            $propertyProperty->default = new Node\Expr\ConstFetch(new Node\Name('null'));
         }
 
         if ($propertyProperty->default !== null) {
