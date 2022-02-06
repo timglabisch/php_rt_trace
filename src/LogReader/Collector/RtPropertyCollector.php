@@ -10,7 +10,7 @@ use timglabisch\PhpRtTrace\RtInternalTracer;
 class RtPropertyCollector implements RtCollectorInterface
 {
     private array $encodedFileNames;
-    private array $buffer;
+    private array $buffer = [];
 
     public function __construct(
         private array $fileNames

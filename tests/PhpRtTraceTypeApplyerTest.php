@@ -37,7 +37,7 @@ class PhpRtTraceTypeApplyerTest extends TestCase
         $pretty = $typeApplyer->getPretty();
 
         $applyedFile = str_replace(['.php'], ['.applyed.php'], $filename);
-        // file_put_contents(str_replace(['.php'], ['.applyed.php'], $filename), $pretty);
+        file_put_contents(str_replace(['.php'], ['.applyed.php'], $filename), $pretty);
 
         static::assertEquals(file_get_contents($applyedFile), $pretty);
     }

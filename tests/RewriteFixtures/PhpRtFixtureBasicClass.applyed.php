@@ -5,7 +5,7 @@ namespace Tests\timglabisch\PhpRtTrace\RewriteFixtures;
 
 class PhpRtFixtureBasicClass
 {
-    private int|string $a;
+    private int|null|string $a = null;
     public function __construct($a)
     {
         $this->a = $a;

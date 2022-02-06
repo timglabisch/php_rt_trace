@@ -13,6 +13,7 @@ class RtInternalTracer
     public const OPCODE_METHOD_RETURN = 3;
     public const OPCODE_PROPERTY_ASSIGN = 4;
     public const OPCODE_PROPERTY_FETCH = 5;
+    public const OPCODE_FILEINFO = 6;
 
     public static ?RtTraceWriterInterface $traceWriter = null;
 
