@@ -12,11 +12,12 @@ use PhpParser\Node\Scalar\String_;
 use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\NodeVisitorAbstract;
 use timglabisch\PhpRtTrace\RtInternalTracer;
+use timglabisch\PhpRtTrace\Visitor\Context\RtVisitorContext;
 
 class RtTraceMethodVisitor extends NodeVisitorAbstract
 {
 
-    public function __construct(private string $file)
+    public function __construct(private RtVisitorContext $context)
     {
     }
 
@@ -87,7 +88,7 @@ class RtTraceMethodVisitor extends NodeVisitorAbstract
                     new LNumber($i),
                     new LNumber($origParam->var->getStartLine()),
                     new LNumber($origParam->var->getEndLine()),
-                    new String_($this->file),
+                    new String_($this->context->getFilename()),
                 ])
             );
         }
@@ -110,7 +111,7 @@ class RtTraceMethodVisitor extends NodeVisitorAbstract
                         new String_($clone->name->name),
                         new LNumber($clone->getStartLine()),
                         new LNumber($clone->getEndLine()),
-                        new String_($this->file),
+                        $this->context->getFileInfoStringAsAstConstFetch(),
                     ])
                 )
             ),

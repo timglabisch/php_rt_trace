@@ -12,13 +12,14 @@ use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitorAbstract;
 use SebastianBergmann\CodeCoverage\Node\AbstractNode;
 use timglabisch\PhpRtTrace\RtInternalTracer;
+use timglabisch\PhpRtTrace\Visitor\Context\RtVisitorContext;
 use timglabisch\PhpRtTrace\Visitor\Helper\RtTraceVisitorIsChildOfVisitor;
 
 class RtTracePropertyAccessReadVisitor extends NodeVisitorAbstract
 {
     private \SplStack $classStack;
 
-    public function __construct(private string $file)
+    public function __construct(private RtVisitorContext $context)
     {
         $this->classStack = new \SplStack();
         $this->nodeStack = new \SplStack();
@@ -137,7 +138,7 @@ class RtTracePropertyAccessReadVisitor extends NodeVisitorAbstract
                 new String_($propertyFetch->name->name),
                 new LNumber($propertyFetch->getStartLine()),
                 new LNumber($propertyFetch->getEndLine()),
-                new String_($this->file),
+                $this->context->getFileInfoStringAsAstConstFetch(),
             ]
         );
 
@@ -186,7 +187,7 @@ class RtTracePropertyAccessReadVisitor extends NodeVisitorAbstract
                                         new String_($propertyFetch->name->name),
                                         new LNumber($propertyFetch->getStartLine()),
                                         new LNumber($propertyFetch->getEndLine()),
-                                        new String_($this->file),
+                                        $this->context->getFileInfoStringAsAstConstFetch(),
                                     ]
                                 );
                             }, $propertyFetches)

@@ -10,10 +10,11 @@ use PhpParser\Node\Scalar\LNumber;
 use PhpParser\Node\Scalar\String_;
 use PhpParser\NodeVisitorAbstract;
 use timglabisch\PhpRtTrace\RtInternalTracer;
+use timglabisch\PhpRtTrace\Visitor\Context\RtVisitorContext;
 
 class RtTraceAssignVisitor extends NodeVisitorAbstract {
 
-    public function __construct(private string $file)
+    public function __construct(private RtVisitorContext $context)
     {
     }
 
@@ -31,7 +32,7 @@ class RtTraceAssignVisitor extends NodeVisitorAbstract {
                         new String_($var->name),
                         new LNumber($var->getStartLine()),
                         new LNumber($var->getEndLine()),
-                        new String_($this->file),
+                        $this->context->getFileInfoStringAsAstConstFetch(),
                     ]
                 );
 

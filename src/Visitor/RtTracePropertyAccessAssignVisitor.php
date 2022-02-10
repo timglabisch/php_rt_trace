@@ -11,12 +11,13 @@ use PhpParser\Node\Scalar\String_;
 use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\NodeVisitorAbstract;
 use timglabisch\PhpRtTrace\RtInternalTracer;
+use timglabisch\PhpRtTrace\Visitor\Context\RtVisitorContext;
 
 class RtTracePropertyAccessAssignVisitor extends NodeVisitorAbstract
 {
     private \SplStack $classStack;
 
-    public function __construct(private string $file)
+    public function __construct(private RtVisitorContext $context)
     {
         $this->classStack = new \SplStack();
     }
@@ -76,7 +77,7 @@ class RtTracePropertyAccessAssignVisitor extends NodeVisitorAbstract
                 new String_($propertyFetch->name->name),
                 new LNumber($propertyFetch->getStartLine()),
                 new LNumber($propertyFetch->getEndLine()),
-                new String_($this->file),
+                $this->context->getFileInfoStringAsAstConstFetch(),
             ]
         );
 

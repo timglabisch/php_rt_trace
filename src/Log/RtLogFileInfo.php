@@ -9,7 +9,7 @@ class RtLogFileInfo
     public function __construct(
         private string $id,
         private string $filename,
-        private string $sha512,
+        private string $hash,
     )
     {
     }
@@ -19,7 +19,31 @@ class RtLogFileInfo
             RtInternalTracer::OPCODE_FILEINFO,
             $this->id,
             $this->filename,
-            $this->sha512,
+            $this->hash,
         ]);
+    }
+
+    public function fromString(string $str): self {
+        [$opcode, $id, $filename, $hash] = json_decode($str, true);
+        if ($opcode !== RtInternalTracer::OPCODE_FILEINFO) {
+            throw new \LogicException('invalid opcode');
+        }
+
+        return new self($id, $filename, $hash);
+    }
+
+    public function getId(): string
+    {
+        return $this->id;
+    }
+
+    public function getFilename(): string
+    {
+        return $this->filename;
+    }
+
+    public function getHash(): string
+    {
+        return $this->hash;
     }
 }

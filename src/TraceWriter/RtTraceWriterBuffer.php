@@ -8,7 +8,7 @@ class RtTraceWriterBuffer implements RtTraceWriterInterface
 {
     private string $buffer = '';
 
-    public function write(array $arr): void
+    public function writeArray(array $arr): void
     {
         try {
             $data = json_encode($arr, JSON_THROW_ON_ERROR);
@@ -17,6 +17,11 @@ class RtTraceWriterBuffer implements RtTraceWriterInterface
         }
 
         $this->buffer .= $data . "\n";
+    }
+
+    public function writeRaw(string $raw): void
+    {
+        $this->buffer .= $raw;
     }
 
     public function getBuffer(): string

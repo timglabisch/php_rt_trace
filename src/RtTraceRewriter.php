@@ -9,6 +9,7 @@ use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor\NameResolver;
 use PhpParser\ParserFactory;
 use PhpParser\PrettyPrinter;
+use timglabisch\PhpRtTrace\Visitor\Context\RtVisitorContext;
 use timglabisch\PhpRtTrace\Visitor\RtTraceAssignVisitor;
 use timglabisch\PhpRtTrace\Visitor\RtTraceFileInfoVisitor;
 use timglabisch\PhpRtTrace\Visitor\RtTraceMethodVisitor;
@@ -45,13 +46,18 @@ class RtTraceRewriter
             echo "Parse error: {$error->getMessage()}\n";
         }
 
+        $context = new RtVisitorContext(
+            fileId: str_replace('.', '', uniqid('RT')),
+            filename: $filename,
+        );
+
         $traverser = new NodeTraverser();
         $traverser->addVisitor(new NameResolver());
-        $traverser->addVisitor(new RtTraceFileInfoVisitor($filename));
-        $traverser->addVisitor(new RtTraceAssignVisitor($filename));
-        $traverser->addVisitor(new RtTracePropertyAccessAssignVisitor($filename));
-        $traverser->addVisitor(new RtTraceMethodVisitor($filename));
-        $traverser->addVisitor(new RtTracePropertyAccessReadVisitor($filename));
+        $traverser->addVisitor(new RtTraceFileInfoVisitor($context));
+        $traverser->addVisitor(new RtTraceAssignVisitor($context));
+        $traverser->addVisitor(new RtTracePropertyAccessAssignVisitor($context));
+        $traverser->addVisitor(new RtTraceMethodVisitor($context));
+        $traverser->addVisitor(new RtTracePropertyAccessReadVisitor($context));
 
         $ast = $traverser->traverse($ast);
 

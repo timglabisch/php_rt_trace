@@ -12,7 +12,7 @@ class RtTraceWriterFile implements RtTraceWriterInterface
     {
     }
 
-    public function write(array $arr): void
+    public function writeArray(array $arr): void
     {
         try {
             $data = json_encode($arr, JSON_THROW_ON_ERROR);
@@ -22,4 +22,11 @@ class RtTraceWriterFile implements RtTraceWriterInterface
 
         file_put_contents($this->filename, $data . "\n", FILE_APPEND | LOCK_EX);
     }
+
+    public function writeRaw(string $raw): void
+    {
+        file_put_contents($this->filename, $raw, FILE_APPEND | LOCK_EX);
+    }
+
+
 }
