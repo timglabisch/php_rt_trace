@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace timglabisch\PhpRtTrace\LogReader\Collector;
 
+use timglabisch\PhpRtTrace\Log\RtLogFileInfo;
 use timglabisch\PhpRtTrace\LogReader\Dto\RtPropertyTypeMap;
 use timglabisch\PhpRtTrace\RtInternalTracer;
 
@@ -22,18 +23,7 @@ class RtPropertyCollector implements RtCollectorInterface
         );
     }
 
-    public function looksInteresting(string $bytes): bool
-    {
-        foreach ($this->encodedFileNames as $encodedFileName) {
-            if (str_contains($bytes, $encodedFileName)) {
-                return true;
-            }
-        }
-
-        return true;
-    }
-
-    public function visit(array $data): void
+    public function visit(RtLogFileInfo $fileInfo, array $data): void
     {
         if (!in_array($data['opcode'] ?? null, [
             RtInternalTracer::OPCODE_PROPERTY_FETCH,

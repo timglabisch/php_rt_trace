@@ -16,20 +16,19 @@ class RtLogFileInfo
 
     public function serializeToString(): string {
         return json_encode([
-            RtInternalTracer::OPCODE_FILEINFO,
-            $this->id,
-            $this->filename,
-            $this->hash,
-        ]);
+            'opcode' => RtInternalTracer::OPCODE_FILEINFO,
+            'id' => $this->id,
+            'filename' => $this->filename,
+            'hash' => $this->hash,
+        ], JSON_THROW_ON_ERROR);
     }
 
-    public function fromString(string $str): self {
-        [$opcode, $id, $filename, $hash] = json_decode($str, true);
-        if ($opcode !== RtInternalTracer::OPCODE_FILEINFO) {
-            throw new \LogicException('invalid opcode');
+    public static function tryFromArray(array $arr): ?self {
+        if ($arr['opcode'] !== RtInternalTracer::OPCODE_FILEINFO) {
+            return null;
         }
 
-        return new self($id, $filename, $hash);
+        return new self($arr['id'], $arr['filename'], $arr['hash']);
     }
 
     public function getId(): string

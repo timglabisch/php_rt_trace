@@ -14,8 +14,8 @@ class PhpRtTracePrettyFilesTest extends TestCase
     public function dataProviderPrettyFilesDummy() {
 
         return [[
-            __DIR__ .'/../example/method/TrTraceByRef.php.pretty.php',
-            __DIR__ .'/../example/method/TrTraceByRef.php',
+            __DIR__ .'/../example/method/RtTraceExampleMethodBasic.php.pretty.php',
+            __DIR__ .'/../example/method/RtTraceExampleMethodBasic.php',
         ]];
     }
 

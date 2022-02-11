@@ -54,10 +54,11 @@ class RtTraceRewriter
         $traverser = new NodeTraverser();
         $traverser->addVisitor(new NameResolver());
         $traverser->addVisitor(new RtTraceFileInfoVisitor($context));
-        $traverser->addVisitor(new RtTraceAssignVisitor($context));
+        // for now, tracing all assigns is too much
+        // $traverser->addVisitor(new RtTraceAssignVisitor($context));
         $traverser->addVisitor(new RtTracePropertyAccessAssignVisitor($context));
-        $traverser->addVisitor(new RtTraceMethodVisitor($context));
         $traverser->addVisitor(new RtTracePropertyAccessReadVisitor($context));
+        //$traverser->addVisitor(new RtTraceMethodVisitor($context));
 
         $ast = $traverser->traverse($ast);
 

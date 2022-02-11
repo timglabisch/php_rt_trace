@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace timglabisch\PhpRtTrace\LogReader;
 
+use timglabisch\PhpRtTrace\Log\RtLogFileInfo;
 use \timglabisch\PhpRtTrace\LogReader\Collector\RtCollectorInterface;
 
 class RtLogReader
@@ -39,11 +40,23 @@ class RtLogReader
                 }
             }
 
+            /** @var RtLogFileInfo[] $fileInfos */
+            $fileInfos = [];
+
             while (($line = fgets($stream)) !== false) {
+                $decodedLine = json_decode($line, true, 512, JSON_THROW_ON_ERROR);
+
+                if ($tryFileInfo = RtLogFileInfo::tryFromArray($decodedLine)) {
+                    $fileInfos[$tryFileInfo->getId()] = $tryFileInfo;
+                    continue;
+                }
+
                 foreach ($this->collectors as $collector) {
-                    if ($collector->looksInteresting($line)) {
-                        $collector->visit(json_decode($line, true));
-                    }
+                    $fileInfo = $fileInfos[
+                        $decodedLine['file'] ?? throw new \LogicException('line without file')
+                    ] ?? throw new \LogicException('could not find file ' . $decodedLine['file']);
+
+                    $collector->visit($fileInfo, $decodedLine);
                 }
             }
 
