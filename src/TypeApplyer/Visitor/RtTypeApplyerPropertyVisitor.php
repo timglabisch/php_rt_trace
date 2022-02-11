@@ -32,7 +32,6 @@ class RtTypeApplyerPropertyVisitor extends NodeVisitorAbstract
                     $this->rewriteProperty($node, $stmt);
                 }
             }
-            $a = 0;
         }
     }
 

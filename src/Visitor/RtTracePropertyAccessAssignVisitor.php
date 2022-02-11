@@ -12,13 +12,16 @@ use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\NodeVisitorAbstract;
 use timglabisch\PhpRtTrace\RtInternalTracer;
 use timglabisch\PhpRtTrace\Visitor\Context\RtVisitorContext;
+use timglabisch\PhpRtTrace\Visitor\Property\RtPropertyAccessInfo;
 
 class RtTracePropertyAccessAssignVisitor extends NodeVisitorAbstract
 {
     private \SplStack $classStack;
 
-    public function __construct(private RtVisitorContext $context)
-    {
+    public function __construct(
+        private RtVisitorContext $context,
+        private RtPropertyAccessInfo $propertyAccessInfo
+    ) {
         $this->classStack = new \SplStack();
     }
 
@@ -52,6 +55,10 @@ class RtTracePropertyAccessAssignVisitor extends NodeVisitorAbstract
 
         // we just care about properties that are accessed like "this->..."!
         if ($propertyFetch->var->name !== "this") {
+            return;
+        }
+
+        if (!$this->propertyAccessInfo->isPropertyFetchInterestingToTrace($this->classStack->top(), $propertyFetch)) {
             return;
         }
 

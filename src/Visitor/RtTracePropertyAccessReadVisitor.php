@@ -14,12 +14,16 @@ use SebastianBergmann\CodeCoverage\Node\AbstractNode;
 use timglabisch\PhpRtTrace\RtInternalTracer;
 use timglabisch\PhpRtTrace\Visitor\Context\RtVisitorContext;
 use timglabisch\PhpRtTrace\Visitor\Helper\RtTraceVisitorIsChildOfVisitor;
+use timglabisch\PhpRtTrace\Visitor\Property\RtPropertyAccessInfo;
 
 class RtTracePropertyAccessReadVisitor extends NodeVisitorAbstract
 {
     private \SplStack $classStack;
 
-    public function __construct(private RtVisitorContext $context)
+    public function __construct(
+        private RtVisitorContext $context,
+        private RtPropertyAccessInfo $propertyAccessInfo
+    )
     {
         $this->classStack = new \SplStack();
         $this->nodeStack = new \SplStack();
@@ -111,7 +115,12 @@ class RtTracePropertyAccessReadVisitor extends NodeVisitorAbstract
             return;
         }
 
-        // we need to know if we're on the left side of an assignment or not.
+        if (!$this->propertyAccessInfo->isPropertyFetchInterestingToTrace($class, $propertyFetch)) {
+            return;
+        }
+
+
+            // we need to know if we're on the left side of an assignment or not.
         // for example
         // $this->foo = XXX;
         // is different to
