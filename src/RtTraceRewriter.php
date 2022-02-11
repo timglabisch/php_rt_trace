@@ -9,16 +9,28 @@ use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor\NameResolver;
 use PhpParser\ParserFactory;
 use PhpParser\PrettyPrinter;
+use timglabisch\PhpRtTrace\FileIdGenerator\RtFileIdGeneratorDefault;
+use timglabisch\PhpRtTrace\FileIdGenerator\RtFileIdGeneratorInterface;
 use timglabisch\PhpRtTrace\Visitor\Context\RtVisitorContext;
 use timglabisch\PhpRtTrace\Visitor\RtTraceAssignVisitor;
 use timglabisch\PhpRtTrace\Visitor\RtTraceFileInfoVisitor;
 use timglabisch\PhpRtTrace\Visitor\RtTraceMethodVisitor;
 use timglabisch\PhpRtTrace\Visitor\RtTracePropertyAccessAssignVisitor;
 use timglabisch\PhpRtTrace\Visitor\RtTracePropertyAccessReadVisitor;
+use timglabisch\PhpRtTrace\Visitor\RtTraceUnsupportedVisitor;
 
 
 class RtTraceRewriter
 {
+    private RtFileIdGeneratorInterface $fileIdGenerator;
+
+    public function __construct(
+        ?RtFileIdGeneratorInterface $fileIdGenerator = null
+    )
+    {
+        $this->fileIdGenerator = $fileIdGenerator ?? new RtFileIdGeneratorDefault();
+    }
+
     public function compileAndInclude(array $files): void
     {
         foreach ($files as $file) {
@@ -47,11 +59,12 @@ class RtTraceRewriter
         }
 
         $context = new RtVisitorContext(
-            fileId: str_replace('.', '', uniqid('RT')),
+            fileId: $this->fileIdGenerator->generateFileId($filename),
             filename: $filename,
         );
 
         $traverser = new NodeTraverser();
+        $traverser->addVisitor(new RtTraceUnsupportedVisitor($context));
         $traverser->addVisitor(new NameResolver(null, ['preserveOriginalNames' => true, 'replaceNodes' => false]));
         $traverser->addVisitor(new RtTraceFileInfoVisitor($context));
         // for now, tracing all assigns is too much
@@ -61,6 +74,11 @@ class RtTraceRewriter
         //$traverser->addVisitor(new RtTraceMethodVisitor($context));
 
         $ast = $traverser->traverse($ast);
+
+        if ($context->getFileIsNotSupportedReason()) {
+            echo 'could not rewrite file ' . $filename . ' reason '. $context->getFileIsNotSupportedReason() . "\n";
+            return $fileContent;
+        }
 
         $prettyPrinter = new PrettyPrinter\Standard();
         $pretty = $prettyPrinter->prettyPrintFile($ast);

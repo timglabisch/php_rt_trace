@@ -8,6 +8,8 @@ use timglabisch\PhpRtTrace\Log\RtLogFileInfo;
 class RtVisitorContext
 {
     private RtLogFileInfo $fileInfo;
+    private ?string $fileIsNotSupportedReason = null;
+
     public function __construct(
         private string $fileId,
         private string $filename,
@@ -17,6 +19,16 @@ class RtVisitorContext
             $this->filename,
             md5_file($this->filename)
         );
+    }
+
+    public function setFileIsNotSupportedReason(?string $fileIsNotSupportedReason): void
+    {
+        $this->fileIsNotSupportedReason = $fileIsNotSupportedReason;
+    }
+
+    public function getFileIsNotSupportedReason(): ?string
+    {
+        return $this->fileIsNotSupportedReason;
     }
 
     public function getFileId(): string

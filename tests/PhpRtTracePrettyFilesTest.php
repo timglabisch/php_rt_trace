@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\timglabisch\PhpRtTrace;
 
 use PHPUnit\Framework\TestCase;
+use timglabisch\PhpRtTrace\FileIdGenerator\RtFileIdGeneratorDebug;
 use timglabisch\PhpRtTrace\RtTraceRewriter;
 
 class PhpRtTracePrettyFilesTest extends TestCase
@@ -34,7 +35,7 @@ class PhpRtTracePrettyFilesTest extends TestCase
     public function testPrettyFiles(string $expectedPrettyFile, string $file): void {
 
         // RtInternalTracer::$traceWriter = $traceWriter = new RtTraceWriterBuffer();
-        $pretty = (new RtTraceRewriter())->rewriteFile($file);
+        $pretty = (new RtTraceRewriter(new RtFileIdGeneratorDebug()))->rewriteFile($file);
         // $traces = implode("\n", $traceWriter->getBuffer());
 
         if (self::REWRITE_FILES) {
