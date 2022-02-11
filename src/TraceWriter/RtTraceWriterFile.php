@@ -33,8 +33,10 @@ class RtTraceWriterFile implements RtTraceWriterInterface
     }
 
     public function flush(bool $useBuffer = true): void {
-        if ($useBuffer && strlen($this->buffer) < 5000) {
-            return;
+        if ($useBuffer) {
+            if (strlen($this->buffer) < 5000) {
+                return;
+            }
         }
 
         if ($this->buffer === '') {

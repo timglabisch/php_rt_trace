@@ -42,6 +42,10 @@ class RtPropertyAccessInfo
 
     public function isPropertyFetchInterestingToTrace(Class_ $class, PropertyFetch $property): bool {
 
+        if ($class->name === null) {
+            return false;
+        }
+
         if ($property->name instanceof Identifier) {
             return isset($this->data[$class->name->name][$property->name->name]);
         }

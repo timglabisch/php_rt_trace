@@ -24,6 +24,11 @@ class RtTraceWriterBuffer implements RtTraceWriterInterface
         $this->buffer .= $raw;
     }
 
+    public function flush(bool $useBuffer = true): void
+    {
+
+    }
+
     public function getBuffer(): string
     {
         return $this->buffer;
