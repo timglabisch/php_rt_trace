@@ -10,7 +10,7 @@ class ApplyerFixtureBasicClass
     private $c = 12;
     private $d = 12.0;
     private $e = 'foo';
-    private $f = \Tests\timglabisch\PhpRtTrace\ApplyerFixtures\ApplyerFixtureBasicClass::class;
+    private $f = ApplyerFixtureBasicClass::class;
     private $g = [];
     private $h = null;
     private int $b;

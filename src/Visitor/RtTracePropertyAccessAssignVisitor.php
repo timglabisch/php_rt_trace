@@ -58,15 +58,15 @@ class RtTracePropertyAccessAssignVisitor extends NodeVisitorAbstract
             return;
         }
 
-        if (!$this->propertyAccessInfo->isPropertyFetchInterestingToTrace($this->classStack->top(), $propertyFetch)) {
-            return;
-        }
-
         if (!$propertyFetch->name instanceof Node\Identifier) {
             return;
         }
 
         if ($this->classStack->isEmpty()) {
+            return;
+        }
+
+        if (!$this->propertyAccessInfo->isPropertyFetchInterestingToTrace($this->classStack->top(), $propertyFetch)) {
             return;
         }
 

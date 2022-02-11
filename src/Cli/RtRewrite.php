@@ -61,9 +61,9 @@ class RtRewrite
         foreach ($files as $file) {
             $rewrittenContent = $rewriter->rewriteFile($file->getPathname());
 
-            file_put_contents($file->getPathname(), $rewrittenContent);
+            echo "rewrite " . $file->getPathname();
 
-            echo "rewritten " . $file->getPathname() . "\n";
+            file_put_contents($file->getPathname(), $rewrittenContent);
 
             $out = '';
             $code = '';
@@ -73,6 +73,8 @@ class RtRewrite
                 echo 'linting failed' . "\n";
                 die();
             }
+
+            echo " - done\n";
 
         }
 

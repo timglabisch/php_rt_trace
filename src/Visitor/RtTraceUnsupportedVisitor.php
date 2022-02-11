@@ -22,6 +22,10 @@ class RtTraceUnsupportedVisitor extends NodeVisitorAbstract
             }
         }
 
+        if ($node instanceof Node\Stmt\Trait_) {
+            $this->context->setFileIsNotSupportedReason("traits are not supported yet");
+        }
+
         if ($node instanceof Node\Stmt\Class_) {
             if (!$node->name) {
                 $this->context->setFileIsNotSupportedReason("files with anon classes are not yet supported.");
