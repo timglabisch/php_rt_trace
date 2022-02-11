@@ -57,6 +57,9 @@ class RtTraceFileInfoVisitor extends NodeVisitorAbstract {
             if ($node instanceof Node\Stmt\Declare_) {
                 $minPos = $k + 1;
             }
+            if ($node instanceof Node\Stmt\Use_) {
+                $minPos = $k + 1;
+            }
         }
 
         array_splice( $nodes, $minPos, 0, [$this->createDefineStatement()]);

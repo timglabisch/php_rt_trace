@@ -40,7 +40,7 @@ class PhpRtTraceAndRewriteTest extends TestCase
         $pretty = $typeApplyer->getPretty();
 
         $applyedFile = str_replace(['.php'], ['.applyed.php'], $file);
-        file_put_contents($applyedFile, $pretty);
+        // file_put_contents($applyedFile, $pretty);
 
         static::assertEquals(file_get_contents($applyedFile), $pretty);
 

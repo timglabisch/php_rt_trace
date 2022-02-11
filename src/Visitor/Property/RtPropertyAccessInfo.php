@@ -24,7 +24,7 @@ class RtPropertyAccessInfo
             return;
         }
 
-        $this->data[$class->name->name] = $data[$class->name->name] ?? [];
+        $this->data[$class->name->name] ??= [];
         $this->data[$class->name->name][$property->props[0]->name->name] = true;
     }
 

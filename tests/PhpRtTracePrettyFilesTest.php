@@ -10,7 +10,7 @@ use timglabisch\PhpRtTrace\RtTraceRewriter;
 
 class PhpRtTracePrettyFilesTest extends TestCase
 {
-    private const REWRITE_FILES = true;
+    private const REWRITE_FILES = false;
 
     public function dataProviderPrettyFilesDummy() {
 
