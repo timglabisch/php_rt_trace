@@ -117,9 +117,26 @@ class RtTypeApplyerPropertyVisitor extends NodeVisitorAbstract
 
         usort($typeInfo, fn(string $a, string $b) => strnatcmp($a, $b));
 
-        $identifiers = array_map(fn(string $type) => new Identifier($type), $typeInfo);
+        $identifiers = array_map(function(string $type) {
+
+            if (in_array($type, [
+                'bool',
+                'int',
+                'float',
+                'string',
+                'array',
+                'object',
+                'mixed',
+                'null',
+            ])) {
+                return new Identifier($type);
+            }
+
+            return new Identifier('\\'.$type);
+        }, $typeInfo);
 
         // todo, originaltyp rausfinden welches mit "=" gesetzt wurde.
+
 
         if (count($identifiers) === 1) {
             $property->type = $identifiers[0];
