@@ -37,6 +37,10 @@ class RtTraceWriterFile implements RtTraceWriterInterface
             return;
         }
 
+        if ($this->buffer === '') {
+            return;
+        }
+
         file_put_contents($this->filename, $this->buffer, FILE_APPEND | LOCK_EX);
         $this->buffer = '';
     }

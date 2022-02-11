@@ -43,7 +43,7 @@ class RtTypeApplyer extends NodeVisitorAbstract
 
     public function applyPropertyTypes(RtPropertyTypeMap $propertyTypeMap): void {
         $traverser = new NodeTraverser();
-        $traverser->addVisitor(new NameResolver());
+        $traverser->addVisitor(new NameResolver(null, ['preserveOriginalNames' => true, 'replaceNodes' => false]));
         $traverser->addVisitor(new RtTypeApplyerPropertyVisitor($propertyTypeMap));
         $this->ast = $traverser->traverse($this->ast);
     }

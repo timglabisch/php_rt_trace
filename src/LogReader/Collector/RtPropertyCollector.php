@@ -17,10 +17,7 @@ class RtPropertyCollector implements RtCollectorInterface
         private array $fileNames
     )
     {
-        $this->encodedFileNames = array_map(
-            fn(string $v) => trim(json_encode($v), ""),
-            $this->fileNames
-        );
+
     }
 
     public function visit(RtLogFileInfo $fileInfo, array $data): void
@@ -32,12 +29,12 @@ class RtPropertyCollector implements RtCollectorInterface
             return;
         }
 
-        if (!in_array($data['file'], $this->fileNames, true)) {
+        if (!in_array($fileInfo->getFilename(), $this->fileNames, true)) {
             return;
         }
 
-        $this->buffer[$data['class']] = $this->buffer[$data['class']] ?? [];
-        $this->buffer[$data['class']][$data['propertyName']] = $this->buffer[$data['class']][$data['propertyName']] ?? [
+        $this->buffer[$data['class']] ??=  [];
+        $this->buffer[$data['class']][$data['propertyName']] ??= [
             'types' => []
         ];
 
