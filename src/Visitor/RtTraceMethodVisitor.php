@@ -82,7 +82,7 @@ class RtTraceMethodVisitor extends NodeVisitorAbstract
             $params[] = new Node\Arg(
                 new Node\Expr\StaticCall(new Node\Name('\\'.RtInternalTracer::class), 'traceMethodParam', [
                     $origParamClone->var,
-                    new String_($class->namespacedName?->toString() ?? 'unknown'),
+                    new Node\Expr\ConstFetch(new Node\Name('__CLASS__')),
                     new String_($clone->name->name),
                     new String_($origParam->var->name),
                     new LNumber($i),
@@ -107,7 +107,7 @@ class RtTraceMethodVisitor extends NodeVisitorAbstract
                 : new Node\Stmt\Return_(
                     new Node\Expr\StaticCall(new Node\Name('\\'.RtInternalTracer::class), 'traceMethodReturn', [
                         $methodCall,
-                        new String_($class->namespacedName?->toString() ?? 'unknown'),
+                        new Node\Expr\ConstFetch(new Node\Name('__CLASS__')),
                         new String_($clone->name->name),
                         new LNumber($clone->getStartLine()),
                         new LNumber($clone->getEndLine()),

@@ -52,7 +52,7 @@ class RtTraceRewriter
         );
 
         $traverser = new NodeTraverser();
-        $traverser->addVisitor(new NameResolver());
+        $traverser->addVisitor(new NameResolver(null, ['preserveOriginalNames' => true, 'replaceNodes' => false]));
         $traverser->addVisitor(new RtTraceFileInfoVisitor($context));
         // for now, tracing all assigns is too much
         // $traverser->addVisitor(new RtTraceAssignVisitor($context));

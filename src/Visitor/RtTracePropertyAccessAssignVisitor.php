@@ -73,7 +73,7 @@ class RtTracePropertyAccessAssignVisitor extends NodeVisitorAbstract
             name: new Node\Identifier('tracePropertyAssign'),
             args: [
                 $node->expr,
-                new String_($class->namespacedName?->toString() ?? 'unknown'),
+                new Node\Expr\ConstFetch(new Node\Name('__CLASS__')),
                 new String_($propertyFetch->name->name),
                 new LNumber($propertyFetch->getStartLine()),
                 new LNumber($propertyFetch->getEndLine()),

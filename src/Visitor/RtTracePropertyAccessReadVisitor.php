@@ -134,7 +134,7 @@ class RtTracePropertyAccessReadVisitor extends NodeVisitorAbstract
             name: new Node\Identifier('tracePropertyFetch'),
             args: [
                 $node,
-                new String_($class->namespacedName?->toString() ?? 'unknown'),
+                new Node\Expr\ConstFetch(new Node\Name('__CLASS__')),
                 new String_($propertyFetch->name->name),
                 new LNumber($propertyFetch->getStartLine()),
                 new LNumber($propertyFetch->getEndLine()),
@@ -183,7 +183,7 @@ class RtTracePropertyAccessReadVisitor extends NodeVisitorAbstract
                                     name: new Node\Identifier('tracePropertyFetch'),
                                     args: [
                                         $propertyFetch,
-                                        new String_($class->namespacedName?->toString() ?? 'unknown'),
+                                        new Node\Expr\ConstFetch(new Node\Name('__CLASS__')),
                                         new String_($propertyFetch->name->name),
                                         new LNumber($propertyFetch->getStartLine()),
                                         new LNumber($propertyFetch->getEndLine()),
