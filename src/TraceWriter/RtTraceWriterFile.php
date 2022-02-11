@@ -6,6 +6,8 @@ namespace timglabisch\PhpRtTrace\TraceWriter;
 
 class RtTraceWriterFile implements RtTraceWriterInterface
 {
+    private string $buffer = '';
+
     public function __construct(
         private string $filename,
     )
@@ -20,13 +22,32 @@ class RtTraceWriterFile implements RtTraceWriterInterface
             $data = @json_encode(['opcode' => 'error', 'msg' => $t]);
         }
 
-        file_put_contents($this->filename, $data . "\n", FILE_APPEND | LOCK_EX);
+        $this->buffer .= $data . "\n";
+        $this->flush(true);
     }
 
     public function writeRaw(string $raw): void
     {
-        file_put_contents($this->filename, $raw, FILE_APPEND | LOCK_EX);
+        $this->buffer .= $raw;
+        $this->flush(true);
     }
 
+    public function flush(bool $useBuffer = true): void {
+        if ($useBuffer && strlen($this->buffer) < 5000) {
+            return;
+        }
+
+        file_put_contents($this->filename, $this->buffer, FILE_APPEND | LOCK_EX);
+        $this->buffer = '';
+    }
+
+    public function __destruct()
+    {
+        if ($this->buffer === '') {
+            return;
+        }
+
+        $this->flush(false);
+    }
 
 }
