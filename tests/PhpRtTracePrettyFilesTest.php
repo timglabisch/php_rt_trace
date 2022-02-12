@@ -10,13 +10,13 @@ use timglabisch\PhpRtTrace\RtTraceRewriter;
 
 class PhpRtTracePrettyFilesTest extends TestCase
 {
-    private const REWRITE_FILES = false;
+    private const REWRITE_FILES = true;
 
     public function dataProviderPrettyFilesDummy() {
 
         return [[
-            __DIR__ .'/../example/method/RtTraceExampleMethodBasic.php.pretty.php',
-            __DIR__ .'/../example/method/RtTraceExampleMethodBasic.php',
+            __DIR__ .'/../example/property/RtTracePropertyAdvancedAccess.php.pretty.php',
+            __DIR__ .'/../example/property/RtTracePropertyAdvancedAccess.php',
         ]];
     }
 
@@ -31,7 +31,7 @@ class PhpRtTracePrettyFilesTest extends TestCase
         }
     }
 
-    /** @dataProvider dataProviderPrettyFiles */
+    /** @dataProvider dataProviderPrettyFilesDummy */
     public function testPrettyFiles(string $expectedPrettyFile, string $file): void {
 
         // RtInternalTracer::$traceWriter = $traceWriter = new RtTraceWriterBuffer();

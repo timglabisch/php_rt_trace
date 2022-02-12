@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace timglabisch\PhpRtTrace\Visitor;
 
 use PhpParser\Node;
+use PhpParser\Node\Expr\PropertyFetch;
 use PhpParser\Node\Name\FullyQualified;
 use PhpParser\Node\Scalar\LNumber;
 use PhpParser\Node\Scalar\String_;
@@ -84,6 +85,16 @@ class RtTracePropertyAccessReadVisitor extends NodeVisitorAbstract
             return;
         }
 
+        $isIncDec = fn ($node) => $node instanceof Node\Expr\PostInc || $node instanceof Node\Expr\PreInc || $node instanceof Node\Expr\PostDec || $node instanceof Node\Expr\PreDec;
+
+        if ($isIncDec($node)) {
+            return $this->leaveNodePrePostInc($node);
+        }
+
+        if ($this->findNodeByNodeStack(fn (Node $v) => $isIncDec($v))) {
+            return;
+        }
+
         if ($node instanceof Node\Expr\FuncCall) {
             return $this->leaveNodeFuncCall($node);
         }
@@ -138,11 +149,15 @@ class RtTracePropertyAccessReadVisitor extends NodeVisitorAbstract
             return;
         }
 
+        return $this->traceExpression($propertyFetch, $node);
+    }
+
+    private function traceExpression(PropertyFetch $propertyFetch, Node\Expr $expression) {
         return new Node\Expr\StaticCall(
             class: new FullyQualified(RtInternalTracer::class),
             name: new Node\Identifier('tracePropertyFetch'),
             args: [
-                $node,
+                $expression,
                 new Node\Expr\ConstFetch(new Node\Name('__CLASS__')),
                 new String_($propertyFetch->name->name),
                 new LNumber($propertyFetch->getStartLine()),
@@ -150,7 +165,19 @@ class RtTracePropertyAccessReadVisitor extends NodeVisitorAbstract
                 $this->context->getFileInfoStringAsAstConstFetch(),
             ]
         );
+    }
 
+    public function leaveNodePrePostInc(Node\Expr\PostInc|Node\Expr\PostDec|Node\Expr\PreInc|Node\Expr\PreDec $node) {
+
+        if (!($node->var instanceof PropertyFetch)) {
+            return;
+        }
+
+        if (!$this->classStack->top() || !$this->propertyAccessInfo->isPropertyFetchInterestingToTrace($this->classStack->top(), $node->var)) {
+            return;
+        }
+
+        return $this->traceExpression($node->var, $node);
     }
 
     public function leaveNodeFuncCall(Node\Expr\FuncCall $call) {
@@ -161,7 +188,11 @@ class RtTracePropertyAccessReadVisitor extends NodeVisitorAbstract
                 continue;
             }
 
-            if ($arg->value instanceof Node\Expr\PropertyFetch) {
+            if (
+                $arg->value instanceof Node\Expr\PropertyFetch
+                && $this->classStack->top()
+                && $this->propertyAccessInfo->isPropertyFetchInterestingToTrace($this->classStack->top(), $arg->value)
+            ) {
                 $propertyFetches[] = $arg->value;
             }
         }
