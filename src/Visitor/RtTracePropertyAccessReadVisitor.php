@@ -85,13 +85,21 @@ class RtTracePropertyAccessReadVisitor extends NodeVisitorAbstract
             return;
         }
 
-        $isIncDec = fn ($node) => $node instanceof Node\Expr\PostInc || $node instanceof Node\Expr\PreInc || $node instanceof Node\Expr\PostDec || $node instanceof Node\Expr\PreDec;
 
-        if ($isIncDec($node)) {
-            return $this->leaveNodePrePostInc($node);
+
+        $isPrePostAssign = fn ($node) =>
+            $node instanceof Node\Expr\PostInc
+            || $node instanceof Node\Expr\PreInc
+            || $node instanceof Node\Expr\PostDec
+            || $node instanceof Node\Expr\PreDec
+            || $node instanceof Node\Expr\AssignOp
+        ;
+
+        if ($isPrePostAssign($node)) {
+            return $this->leaveNodePrePostAssign($node);
         }
 
-        if ($this->findNodeByNodeStack(fn (Node $v) => $isIncDec($v))) {
+        if ($this->findNodeByNodeStack(fn (Node $v) => $isPrePostAssign($v))) {
             return;
         }
 
@@ -167,8 +175,11 @@ class RtTracePropertyAccessReadVisitor extends NodeVisitorAbstract
         );
     }
 
-    public function leaveNodePrePostInc(Node\Expr\PostInc|Node\Expr\PostDec|Node\Expr\PreInc|Node\Expr\PreDec $node) {
+    public function leaveNodePrePostAssign(Node\Expr\PostInc|Node\Expr\PostDec|Node\Expr\PreInc|Node\Expr\PreDec|Node\Expr\AssignOp $node) {
 
+        // both are invalid php (if b needs a reference)
+        // b($a->a += 1);
+        // b($a->a++);
         if (!($node->var instanceof PropertyFetch)) {
             return;
         }
