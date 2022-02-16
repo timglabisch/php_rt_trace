@@ -11,7 +11,7 @@ use PhpParser\Node\Scalar\LNumber;
 use PhpParser\Node\Scalar\String_;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitorAbstract;
-use SebastianBergmann\CodeCoverage\Node\AbstractNode;
+use Symfony\Component\DependencyInjection\Variable;
 use timglabisch\PhpRtTrace\RtInternalTracer;
 use timglabisch\PhpRtTrace\Visitor\Context\RtVisitorContext;
 use timglabisch\PhpRtTrace\Visitor\Helper\RtTraceVisitorIsChildOfVisitor;
@@ -85,8 +85,6 @@ class RtTracePropertyAccessReadVisitor extends NodeVisitorAbstract
             return;
         }
 
-
-
         $isPrePostAssign = fn ($node) =>
             $node instanceof Node\Expr\PostInc
             || $node instanceof Node\Expr\PreInc
@@ -100,6 +98,16 @@ class RtTracePropertyAccessReadVisitor extends NodeVisitorAbstract
         }
 
         if ($this->findNodeByNodeStack(fn (Node $v) => $isPrePostAssign($v))) {
+            return;
+        }
+
+        $isIsset = fn (Node $node) => $node instanceof Node\Expr\Isset_;
+
+        if ($isIsset($node)) {
+            return $this->leaveNodeIsset($node);
+        }
+
+        if (!$this->nodeStack->isEmpty() && ($parent = $this->nodeStack->top()) && $isIsset($parent)) {
             return;
         }
 
@@ -160,6 +168,16 @@ class RtTracePropertyAccessReadVisitor extends NodeVisitorAbstract
         return $this->traceExpression($propertyFetch, $node);
     }
 
+    private function buildRecusiveBooleanAnd(array $expression) {
+        if (count($expression) === 1) {
+            return $expression[0];
+        }
+
+        $item = array_shift($expression);
+
+        return new Node\Expr\BinaryOp\BooleanAnd($item, $this->buildRecusiveBooleanAnd($expression));
+    }
+
     private function traceExpression(PropertyFetch $propertyFetch, Node\Expr $expression) {
         return new Node\Expr\StaticCall(
             class: new FullyQualified(RtInternalTracer::class),
@@ -173,6 +191,35 @@ class RtTracePropertyAccessReadVisitor extends NodeVisitorAbstract
                 $this->context->getFileInfoStringAsAstConstFetch(),
             ]
         );
+    }
+
+    public function leaveNodeIsset(Node\Expr\Isset_ $call) {
+        $calls = [];
+        foreach ($call->vars as $expr) {
+            $calls[] = new Node\Expr\FuncCall(
+                new Node\Expr\Closure([
+                    'stmts' => [
+                        new Node\Stmt\Expression(new Node\Expr\Assign(
+                            new Node\Expr\Variable('expr'),
+                            $expr
+                        )),
+                        new Node\Stmt\If_(
+                            new Node\Expr\BooleanNot(new Node\Expr\Isset_([new PropertyFetch(new Node\Expr\Variable('this'), new Node\Expr\Variable('expr'))])),
+                            [
+                                'stmts' => [
+                                    new Node\Stmt\Return_(new Node\Expr\ConstFetch(new Node\Name('false')))
+                                ]
+                            ]
+                        ),
+                        new Node\Stmt\Expression($this->traceExpression($expr, $expr)),
+                        new Node\Stmt\Return_(new Node\Expr\ConstFetch(new Node\Name('true')))
+                    ]
+                ])
+            );
+        }
+
+        return $this->buildRecusiveBooleanAnd($calls);
+
     }
 
     public function leaveNodePrePostAssign(Node\Expr\PostInc|Node\Expr\PostDec|Node\Expr\PreInc|Node\Expr\PreDec|Node\Expr\AssignOp $node) {
