@@ -8,10 +8,13 @@ class RtTracePropertyAdvancedAccess
     private $b = [];
 
     private function foo() {
+        unset($this->b['x']);
+        unset($this->b);
         $this->b =& $a;
         $this->b =& $this->a;
         $this->b &= $a;
         $this->b &= $this->a;
+        $this->b['x'] = 'a';
         $this->a++;
         $this->a = $this->a++;
         $this->a = $this->a = $this->a++;

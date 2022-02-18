@@ -105,15 +105,20 @@ class RtTracePropertyAccessReadVisitor extends NodeVisitorAbstract
             return;
         }
 
+        $parent = !$this->nodeStack->isEmpty() ? $this->nodeStack->top() : null;
+
         $isIsset = fn (Node $node) => $node instanceof Node\Expr\Isset_;
 
         if ($isIsset($node)) {
             return $this->leaveNodeIsset($node);
         }
 
-        $parent = !$this->nodeStack->isEmpty() ? $this->nodeStack->top() : null;
-
         if ($parent && $isIsset($parent)) {
+            return;
+        }
+
+        if ($this->findNodeByNodeStack(fn (Node $node) => $node instanceof Node\Stmt\Unset_)) {
+            // unset is dangerous, never intersect it.
             return;
         }
 
