@@ -6,12 +6,12 @@ namespace timglabisch\PhpRtTrace\Visitor;
 
 use PhpParser\Node;
 use PhpParser\Node\Expr\PropertyFetch;
+use PhpParser\Node\Expr\Variable;
 use PhpParser\Node\Name\FullyQualified;
 use PhpParser\Node\Scalar\LNumber;
 use PhpParser\Node\Scalar\String_;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitorAbstract;
-use Symfony\Component\DependencyInjection\Variable;
 use timglabisch\PhpRtTrace\RtInternalTracer;
 use timglabisch\PhpRtTrace\Visitor\Context\RtVisitorContext;
 use timglabisch\PhpRtTrace\Visitor\Helper\RtTraceVisitorIsChildOfVisitor;
@@ -159,9 +159,11 @@ class RtTracePropertyAccessReadVisitor extends NodeVisitorAbstract
             return; // @see RtTracePropertyAccessAssignVisitor
         }
 
-        if ($this->findNodeByNodeStack(fn (Node $v) => $v instanceof Node\Arg)) {
-            // when our current node is part of a param (function call) it becomes a bit trickier
-            // because the function call might want to have &$this->XXX instead of $this->XXX
+        if (
+            !$this->nodeStack->isEmpty()
+            && ($parent = $this->nodeStack->top())
+            && $parent instanceof Node\Arg
+        ) {
             return;
         }
 
@@ -194,17 +196,48 @@ class RtTracePropertyAccessReadVisitor extends NodeVisitorAbstract
     }
 
     public function leaveNodeIsset(Node\Expr\Isset_ $call) {
+        $class = $this->classStack->isEmpty() ? null : $this->classStack->top();
+
+        if (!$class) {
+            return $call;
+        }
+
         $calls = [];
         foreach ($call->vars as $expr) {
+            if (!($expr instanceof PropertyFetch)) {
+                $calls[] = new Node\Expr\Isset_([$expr]);
+                continue;
+            }
+
+            $var = $expr->var;
+            if (!($var instanceof Variable)) {
+                $calls[] = new Node\Expr\Isset_([$expr]);
+                continue;
+            }
+
+            // property must be in $this scope.
+            if ($var->name !== 'this') {
+                $calls[] = new Node\Expr\Isset_([$expr]);
+                continue;
+            }
+
+            if (!$this->propertyAccessInfo->isPropertyFetchInterestingToTrace($class, $expr)) {
+                $calls[] = new Node\Expr\Isset_([$expr]);
+                continue;
+            }
+
+            // isset with expressions like $this->{'x'} are not supported yet.
+            // they may contain variables that are not in the function scope we generate ...
+            if (!($expr->name instanceof Node\Identifier)) {
+                $calls[] = new Node\Expr\Isset_([$expr]);
+                continue;
+            }
+
             $calls[] = new Node\Expr\FuncCall(
                 new Node\Expr\Closure([
                     'stmts' => [
-                        new Node\Stmt\Expression(new Node\Expr\Assign(
-                            new Node\Expr\Variable('expr'),
-                            $expr
-                        )),
                         new Node\Stmt\If_(
-                            new Node\Expr\BooleanNot(new Node\Expr\Isset_([new PropertyFetch(new Node\Expr\Variable('this'), new Node\Expr\Variable('expr'))])),
+                            new Node\Expr\BooleanNot(new Node\Expr\Isset_([$expr])),
                             [
                                 'stmts' => [
                                     new Node\Stmt\Return_(new Node\Expr\ConstFetch(new Node\Name('false')))
