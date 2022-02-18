@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace timglabisch\PhpRtTrace\Visitor;
 
 use PhpParser\Node;
+use PhpParser\Node\Expr\AssignOp;
 use PhpParser\Node\Expr\PropertyFetch;
 use PhpParser\Node\Expr\Variable;
 use PhpParser\Node\Name\FullyQualified;
@@ -43,7 +44,7 @@ class RtTracePropertyAccessReadVisitor extends NodeVisitorAbstract
     public function getAssignFromNodeStack(): array {
         $assigns = [];
         foreach ($this->nodeStack as $v) {
-            if ($v instanceof Node\Expr\Assign) {
+            if ($v instanceof Node\Expr\AssignOp) {
                 $assigns[] = $v;
             }
         }
@@ -255,15 +256,24 @@ class RtTracePropertyAccessReadVisitor extends NodeVisitorAbstract
 
     }
 
-    public function leaveNodePrePostAssign(Node\Expr\PostInc|Node\Expr\PostDec|Node\Expr\PreInc|Node\Expr\PreDec|Node\Expr\AssignOp $node) {
+    public function leaveNodePrePostAssign(Node\Expr\PostInc|Node\Expr\PostDec|Node\Expr\PreInc|Node\Expr\PreDec|AssignOp $node) {
 
-        // both are invalid php (if b needs a reference)
-        // b($a->a += 1);
-        // b($a->a++);
+        // do not trace bitwise operations
+        if (
+            $node instanceof AssignOp\BitwiseAnd
+            || $node instanceof AssignOp\BitwiseOr
+            || $node instanceof AssignOp\BitwiseXor
+        ) {
+            return;
+        }
+
         if (!($node->var instanceof PropertyFetch)) {
             return;
         }
 
+        // both are invalid php (if b needs a reference)
+        // b($a->a += 1);
+        // b($a->a++);
         if (!$this->classStack->top() || !$this->propertyAccessInfo->isPropertyFetchInterestingToTrace($this->classStack->top(), $node->var)) {
             return;
         }
