@@ -44,7 +44,7 @@ class RtTracePropertyAccessReadVisitor extends NodeVisitorAbstract
     public function getAssignFromNodeStack(): array {
         $assigns = [];
         foreach ($this->nodeStack as $v) {
-            if ($v instanceof Node\Expr\AssignOp) {
+            if ($v instanceof Node\Expr\Assign) {
                 $assigns[] = $v;
             }
         }
