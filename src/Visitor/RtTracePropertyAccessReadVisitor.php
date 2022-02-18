@@ -44,7 +44,10 @@ class RtTracePropertyAccessReadVisitor extends NodeVisitorAbstract
     public function getAssignFromNodeStack(): array {
         $assigns = [];
         foreach ($this->nodeStack as $v) {
-            if ($v instanceof Node\Expr\Assign) {
+            if (
+                $v instanceof Node\Expr\Assign
+                || $v instanceof Node\Expr\AssignRef
+            ) {
                 $assigns[] = $v;
             }
         }
@@ -108,7 +111,9 @@ class RtTracePropertyAccessReadVisitor extends NodeVisitorAbstract
             return $this->leaveNodeIsset($node);
         }
 
-        if (!$this->nodeStack->isEmpty() && ($parent = $this->nodeStack->top()) && $isIsset($parent)) {
+        $parent = !$this->nodeStack->isEmpty() ? $this->nodeStack->top() : null;
+
+        if ($parent && $isIsset($parent)) {
             return;
         }
 
@@ -117,6 +122,10 @@ class RtTracePropertyAccessReadVisitor extends NodeVisitorAbstract
         }
 
         if (!$node instanceof Node\Expr\PropertyFetch) {
+            return;
+        }
+
+        if ($parent instanceof Node\Expr\AssignRef) {
             return;
         }
 
@@ -257,15 +266,6 @@ class RtTracePropertyAccessReadVisitor extends NodeVisitorAbstract
     }
 
     public function leaveNodePrePostAssign(Node\Expr\PostInc|Node\Expr\PostDec|Node\Expr\PreInc|Node\Expr\PreDec|AssignOp $node) {
-
-        // do not trace bitwise operations
-        if (
-            $node instanceof AssignOp\BitwiseAnd
-            || $node instanceof AssignOp\BitwiseOr
-            || $node instanceof AssignOp\BitwiseXor
-        ) {
-            return;
-        }
 
         if (!($node->var instanceof PropertyFetch)) {
             return;

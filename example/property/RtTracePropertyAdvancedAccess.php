@@ -8,6 +8,8 @@ class RtTracePropertyAdvancedAccess
     private $b = [];
 
     private function foo() {
+        $this->b =& $a;
+        $this->b =& $this->a;
         $this->b &= $a;
         $this->b &= $this->a;
         $this->a++;
