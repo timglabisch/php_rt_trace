@@ -59,9 +59,9 @@ class RtRewrite
         $rewriter = new RtTraceRewriter();
 
         foreach ($files as $file) {
-            $rewrittenContent = $rewriter->rewriteFile($file->getPathname());
-
             echo "rewrite " . $file->getPathname();
+
+            $rewrittenContent = $rewriter->rewriteFile($file->getPathname());
 
             file_put_contents($file->getPathname(), $rewrittenContent);
 
