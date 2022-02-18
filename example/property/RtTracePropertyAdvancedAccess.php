@@ -27,6 +27,7 @@ class RtTracePropertyAdvancedAccess
         shuffle($this->b[0]);
         isset($this->b);
         isset($this->b, $this->a);
+        $x = isset($this->b[isset($this->a)]);
         empty($this->b);
         foo($this->b + ['a']); // todo we could trace this the easy way
         $this->a ??= 1;
