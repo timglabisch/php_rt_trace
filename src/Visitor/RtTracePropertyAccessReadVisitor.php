@@ -274,7 +274,7 @@ class RtTracePropertyAccessReadVisitor extends NodeVisitorAbstract
         // both are invalid php (if b needs a reference)
         // b($a->a += 1);
         // b($a->a++);
-        if (!$this->classStack->top() || !$this->propertyAccessInfo->isPropertyFetchInterestingToTrace($this->classStack->top(), $node->var)) {
+        if ($this->classStack->isEmpty() || !$this->propertyAccessInfo->isPropertyFetchInterestingToTrace($this->classStack->top(), $node->var)) {
             return;
         }
 
@@ -318,20 +318,26 @@ class RtTracePropertyAccessReadVisitor extends NodeVisitorAbstract
                     'expr' => new Node\Expr\Array_(
                         array_merge(
                             [$call],
-                            array_map(function(Node\Expr\PropertyFetch $propertyFetch) use ($class) {
+                            array_filter(array_map(function(Node\Expr\PropertyFetch $propertyFetch) use ($class) {
+
+                                // expressions are not supported in this case.
+                                if (!($propertyFetch->name instanceof Node\Identifier)) {
+                                    return null;
+                                }
+
                                 return new Node\Expr\StaticCall(
                                     class: new FullyQualified(RtInternalTracer::class),
                                     name: new Node\Identifier('tracePropertyFetch'),
                                     args: [
                                         $propertyFetch,
                                         new Node\Expr\ConstFetch(new Node\Name('__CLASS__')),
-                                        new String_($propertyFetch->name->name),
+                                        new String_($propertyFetch->name->name), // todo, name could be an expression ....
                                         new LNumber($propertyFetch->getStartLine()),
                                         new LNumber($propertyFetch->getEndLine()),
                                         $this->context->getFileInfoStringAsAstConstFetch(),
                                     ]
                                 );
-                            }, $propertyFetches)
+                            }, $propertyFetches))
                         )
                     )
                 ])
