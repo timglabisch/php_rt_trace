@@ -41,6 +41,10 @@ class RtRewrite
                         continue;
                     }
 
+                    if (str_ends_with($item->getBasename(), 'Test.php')) {
+                        continue;
+                    }
+
                     $files[] = $item;
                 }
                 continue;

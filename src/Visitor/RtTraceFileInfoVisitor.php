@@ -33,7 +33,11 @@ class RtTraceFileInfoVisitor extends NodeVisitorAbstract {
     }
 
     private function createDefineStatement(): Node {
-        return new Node\Stmt\Expression(new Node\Expr\FuncCall(
+        return
+            // new Node\Stmt\Expression(new Node\Stmt\If_(new Notnew Node\Expr\FuncCall(new Node\Name('defined'))));
+
+
+            new Node\Stmt\Expression(new Node\Expr\FuncCall(
             new Node\Name('define'), [
                 new Node\Arg(new Node\Scalar\String_('__' . $this->context->getFileId())),
                 new Node\Arg(
