@@ -42,6 +42,7 @@ class PhpRtTraceRunTestsuitesTest extends TestCase
             'rm src/Symfony/Component/VarDumper/Tests/Server/ConnectionTest.php',
             // 'php -n ./vendor/bin/simple-phpunit -c .',
             'php -n ' . $rewrite . ' src',
+            'php -n ./vendor/bin/simple-phpunit -c .',
         ]);
 
     }

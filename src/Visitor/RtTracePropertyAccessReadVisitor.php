@@ -273,6 +273,11 @@ class RtTracePropertyAccessReadVisitor extends NodeVisitorAbstract
 
     public function leaveNodeFuncCall(Node\Expr\FuncCall $call) {
 
+        $class = !$this->classStack->isEmpty() ? $this->classStack->top() : null;
+        if (!$class instanceof Node\Stmt\Class_) {
+            return;
+        }
+
         $propertyFetches = [];
         foreach ($call->args as $arg) {
             if (!($arg instanceof Node\Arg)) {
@@ -281,8 +286,7 @@ class RtTracePropertyAccessReadVisitor extends NodeVisitorAbstract
 
             if (
                 $arg->value instanceof Node\Expr\PropertyFetch
-                && $this->classStack->top()
-                && $this->propertyAccessInfo->isPropertyFetchInterestingToTrace($this->classStack->top(), $arg->value)
+                && $this->propertyAccessInfo->isPropertyFetchInterestingToTrace($class, $arg->value)
             ) {
                 $propertyFetches[] = $arg->value;
             }
@@ -297,10 +301,6 @@ class RtTracePropertyAccessReadVisitor extends NodeVisitorAbstract
             return; // @see RtTracePropertyAccessAssignVisitor
         }
 
-        $class = $this->classStack->top();
-        if (!$class instanceof Node\Stmt\Class_) {
-            return;
-        }
 
         return new Node\Expr\ArrayDimFetch(
             new Node\Expr\FuncCall(

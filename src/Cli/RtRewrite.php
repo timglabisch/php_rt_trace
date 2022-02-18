@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace timglabisch\PhpRtTrace\Cli;
 
+use PhpParser\Error;
 use timglabisch\PhpRtTrace\RtTraceRewriter;
 
 class RtRewrite
@@ -61,7 +62,13 @@ class RtRewrite
         foreach ($files as $file) {
             echo "rewrite " . $file->getPathname();
 
-            $rewrittenContent = $rewriter->rewriteFile($file->getPathname());
+            try {
+                $rewrittenContent = $rewriter->rewriteFile($file->getPathname());
+            } catch (Error $error) {
+                echo "Parse error: {$error->getMessage()}\n";
+                continue;
+            }
+
 
             file_put_contents($file->getPathname(), $rewrittenContent);
 

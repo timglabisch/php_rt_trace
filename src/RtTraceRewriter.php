@@ -54,11 +54,7 @@ class RtTraceRewriter
     public function rewriteFileContent(string $filename, string $fileContent): string
     {
         $parser = (new ParserFactory)->create(ParserFactory::PREFER_PHP7);
-        try {
-            $ast = $parser->parse($fileContent);
-        } catch (Error $error) {
-            echo "Parse error: {$error->getMessage()}\n";
-        }
+        $ast = $parser->parse($fileContent);
 
         $context = new RtVisitorContext(
             fileId: $this->fileIdGenerator->generateFileId($filename),
